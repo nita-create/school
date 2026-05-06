@@ -1,7 +1,9 @@
 import User from '../models/User.js'
+import BaseController from './BaseController.js'
 
-class UserController {
+class UserController extends BaseController {
   constructor() {
+    super()
     this.getUsers = this.getUsers.bind(this)
     this.getUser = this.getUser.bind(this)
     this.createUser = this.createUser.bind(this)
@@ -9,28 +11,14 @@ class UserController {
     this.deleteUser = this.deleteUser.bind(this)
   }
 
-  sendSuccess(res, statusCode, message, data = null) {
-    return res.status(statusCode).json({
-      success: true,
-      message,
-      data
-    })
-  }
-
-  sendError(res, statusCode, message) {
-    return res.status(statusCode).json({
-      success: false,
-      message
-    })
-  }
-
   // GET ALL
   async getUsers(req, res) {
     try {
-      const users = await User.getAll()
-      return this.sendSuccess(res, 200, 'Users fetched successfully', users)
+      const userModel = new User()
+      const users = await userModel.getAll()
+      return this.success(res, 200, 'Users fetched successfully', users)
     } catch (error) {
-      return this.sendError(res, 500, 'Error fetching users')
+      return this.error(res, 500, 'Error fetching users')
     }
   }
 
@@ -38,16 +26,16 @@ class UserController {
   async getUser(req, res) {
     try {
       const { id } = req.params   // destructuring
-
-      const user = await User.getById(id)
+      const userModel = new User()
+      const user = await userModel.getById(id)
 
       if (!user) {
-        return this.sendError(res, 404, 'User not found')
+        return this.error(res, 404, 'User not found')
       }
 
-      return this.sendSuccess(res, 200, 'User fetched successfully', user)
+      return this.success(res, 200, 'User fetched successfully', user)
     } catch (error) {
-      return this.sendError(res, 500, 'Error fetching user')
+      return this.error(res, 500, 'Error fetching user')
     }
   }
 
@@ -57,14 +45,15 @@ class UserController {
       const { name } = req.body   // destructuring
 
       if (!name) {
-        return this.sendError(res, 400, 'Name is required')
+        return this.error(res, 400, 'Name is required')
       }
 
-      const newUser = await User.create(name)
+      const userModel = new User()
+      const newUser = await userModel.create({ name })
 
-      return this.sendSuccess(res, 201, 'User created successfully', newUser)
+      return this.success(res, 201, 'User created successfully', newUser)
     } catch (error) {
-      return this.sendError(res, 500, 'Error creating user')
+      return this.error(res, 500, 'Error creating user')
     }
   }
 
@@ -75,18 +64,19 @@ class UserController {
       const { name } = req.body
 
       if (!name) {
-        return this.sendError(res, 400, 'Name is required')
+        return this.error(res, 400, 'Name is required')
       }
 
-      const updated = await User.update(id, name)
+      const userModel = new User()
+      const updated = await userModel.update(id, { name })
 
       if (!updated) {
-        return this.sendError(res, 404, 'User not found')
+        return this.error(res, 404, 'User not found')
       }
 
-      return this.sendSuccess(res, 200, 'User updated successfully', { id, name })
+      return this.success(res, 200, 'User updated successfully', { id, name })
     } catch (error) {
-      return this.sendError(res, 500, 'Error updating user')
+      return this.error(res, 500, 'Error updating user')
     }
   }
 
@@ -94,16 +84,16 @@ class UserController {
   async deleteUser(req, res) {
     try {
       const { id } = req.params
-
-      const deleted = await User.delete(id)
+      const userModel = new User()
+      const deleted = await userModel.delete(id)
 
       if (!deleted) {
-        return this.sendError(res, 404, 'User not found')
+        return this.error(res, 404, 'User not found')
       }
 
-      return this.sendSuccess(res, 200, 'User deleted successfully')
+      return this.success(res, 200, 'User deleted successfully')
     } catch (error) {
-      return this.sendError(res, 500, 'Error deleting user')
+      return this.error(res, 500, 'Error deleting user')
     }
   }
 }

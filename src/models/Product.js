@@ -1,21 +1,21 @@
 import { db } from '../config/db.js'
 import BaseModel from './BaseModel.js'
 
-class User extends BaseModel {
+class Product extends BaseModel {
   constructor() {
     super()
   }
 
   // GET ALL
   async getAll() {
-    const [rows] = await db.query('SELECT * FROM users')
+    const [rows] = await db.query('SELECT * FROM products')
     return rows
   }
 
   // GET BY ID
   async getById(id) {
     const [rows] = await db.query(
-      'SELECT * FROM users WHERE id = ?', 
+      'SELECT * FROM products WHERE id = ?', 
       [id]
     )
     return rows[0]
@@ -23,20 +23,20 @@ class User extends BaseModel {
 
   // CREATE
   async create(data) {
-    const { name } = data
+    const { name, price, description } = data
     const [result] = await db.query(
-      'INSERT INTO users (name) VALUES (?)',
-      [name]
+      'INSERT INTO products (name, price, description) VALUES (?, ?, ?)',
+      [name, price, description]
     )
-    return { id: result.insertId, name }
+    return { id: result.insertId, name, price, description }
   }
 
   // UPDATE
   async update(id, data) {
-    const { name } = data
+    const { name, price, description } = data
     const [result] = await db.query(
-      'UPDATE users SET name = ? WHERE id = ?',
-      [name, id]
+      'UPDATE products SET name = ?, price = ?, description = ? WHERE id = ?',
+      [name, price, description, id]
     )
     return result.affectedRows
   }
@@ -44,11 +44,11 @@ class User extends BaseModel {
   // DELETE
   async delete(id) {
     const [result] = await db.query(
-      'DELETE FROM users WHERE id = ?',
+      'DELETE FROM products WHERE id = ?',
       [id]
     )
     return result.affectedRows
   }
 }
 
-export default User
+export default Product
